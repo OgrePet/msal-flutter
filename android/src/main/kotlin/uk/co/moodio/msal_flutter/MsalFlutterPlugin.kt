@@ -35,8 +35,10 @@ class MsalFlutterPlugin : FlutterPlugin, ActivityAware {
                 .apply { setMethodCallHandler(handler) }
     }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) =
-            MethodChannel(binding.binaryMessenger, PLUGIN_ID).setMethodCallHandler(null)
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        channel?.setMethodCallHandler(null)
+        channel = null
+    }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
