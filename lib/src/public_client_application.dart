@@ -59,6 +59,7 @@ class PublicClientApplication {
     "NO_CLIENT": MsalUninitializedException.create,
     "CHANGED_CLIENTID": MsalChangedClientIdException.create,
     "INIT_ERROR": MsalInitializationException.create,
+    "NO_UI": MsalNoUiException.create,
     "NO_CLIENTID": () => MsalInvalidConfigurationException("Client Id not set"),
     "INVALID_AUTHORITY": () =>
         MsalInvalidConfigurationException("Invalid authroity set."),

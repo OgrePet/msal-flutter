@@ -59,3 +59,9 @@ class MsalUninitializedException extends MsalException {
   static MsalUninitializedException create() =>
       const MsalUninitializedException();
 }
+
+class MsalNoUiException extends MsalException {
+  const MsalNoUiException() : super("Not attached to UI, which is required for interactive token acquiring");
+
+  static MsalNoUiException create() => const MsalNoUiException();
+}
