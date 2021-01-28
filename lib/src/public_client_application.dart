@@ -53,7 +53,7 @@ class PublicClientApplication {
   }
 
   static final _exceptionMapping = <String, MsalException Function()>{
-    "CANCELLED": MsalUninitializedException.create,
+    "CANCELLED": MsalUserCancelledException.create,
     "NO_SCOPE": MsalInvalidScopeException.create,
     "NO_ACCOUNT": MsalNoAccountException.create,
     "NO_CLIENT": MsalUninitializedException.create,
