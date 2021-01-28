@@ -88,9 +88,13 @@ class MsalMethodCallHandler(private val msalApplicationRef: AtomicReference<IMul
             scopes == null -> result.foregroundError(ERROR_COMMON_NO_SCOPE)
             msalApplication.accounts.isEmpty() -> result.foregroundError(ERROR_SILENT_TOKEN_NO_ACCOUNT)
             else -> {
-                val res = msalApplication.acquireTokenSilent(scopes, msalApplication.accounts[0],
-                        msalApplication.configuration.defaultAuthority.authorityURL.toString())
-                scheduler.foreground { result.success(res.accessToken) }
+                try {
+                    val res = msalApplication.acquireTokenSilent(scopes, msalApplication.accounts[0],
+                            msalApplication.configuration.defaultAuthority.authorityURL.toString())
+                    scheduler.foreground { result.success(res.accessToken) }
+                } catch (e: Exception) {
+                    result.foregroundError(ERROR_SILENT_TOKEN, e.details())
+                }
             }
         }
     }
@@ -125,6 +129,7 @@ class MsalMethodCallHandler(private val msalApplicationRef: AtomicReference<IMul
         private const val ERROR_TOKEN_ACQUIRE = "ERROR_TOKEN_ACQUIRING"
         private const val ERROR_TOKEN_ACQUIRE_CANCELLATION = "ERROR_AUTHENTICATION_CANCELLATION"
         private const val ERROR_SILENT_TOKEN_NO_ACCOUNT = "ERROR_SILENT_TOKEN_NO_ACCOUNT"
+        private const val ERROR_SILENT_TOKEN = "ERROR_SILENT_TOKEN"
         private const val ERROR_LOGOUT = "ERROR_LOGOUT"
         private val ERRORS = mapOf(
                 ERROR_COMMON_NO_CLIENT to ("NO_CLIENT" to "Client must be initialized before attempting any operation besides \"initialize\"."),
@@ -136,6 +141,7 @@ class MsalMethodCallHandler(private val msalApplicationRef: AtomicReference<IMul
                 ERROR_TOKEN_ACQUIRE to ("ACQUIRE_TOKEN" to "Error occurred during token acquiring"),
                 ERROR_TOKEN_ACQUIRE_CANCELLATION to ("CANCELLED" to "User cancelled"),
                 ERROR_SILENT_TOKEN_NO_ACCOUNT to ("NO_ACCOUNT" to "No account is available to acquire token silently for"),
+                ERROR_SILENT_TOKEN to ("ACQUIRE_TOKEN" to "Error occurred during silent token acquiring"),
                 ERROR_LOGOUT to ("LOGOUT_ERROR" to "Logging out failed"),
         )
 
