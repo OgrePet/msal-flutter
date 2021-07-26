@@ -13,8 +13,8 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
     let instance = SwiftMsalFlutterPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) 
+  
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult)
   {
     //get the arguments as a dictionary
     let dict = call.arguments! as! NSDictionary
@@ -24,11 +24,11 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
 
     switch( call.method ){
       case "initialize": initialize(clientId: clientId, authority: authority, result: result)
-      case "acquireToken": acquireToken(scopes: scopes, result: result)
-      case "acquireTokenSilent": acquireTokenSilent(scopes: scopes, result: result)
+      case "acquireToken": acquireToken(scopes: filterReservedScopes(scopes: scopes), result: result)
+      case "acquireTokenSilent": acquireTokenSilent(scopes: filterReservedScopes(scopes: scopes), result: result)
       case "logout": logout(result: result)
       default: result(FlutterError(code:"INVALID_METHOD", message: "The method called is invalid", details: nil))
-    } 
+    }
   }
 
 
@@ -78,7 +78,7 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
         }
         //set account as the first account
         account = cachedAccounts.first!
-      } 
+      }
       catch{
         result(FlutterError(code: "NO_ACCOUNT",  message: "Error retrieving an existing account", details: nil))
       }
@@ -114,7 +114,7 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
 
     //setup the config, using authority if it is set, or defaulting to msal's own implementation if it's not
     if !SwiftMsalFlutterPlugin.authority.isEmpty
-    {     
+    {
       //try creating the msal aad authority object
       do{
         //create authority url
@@ -174,7 +174,7 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
 
         let account = cachedAccounts.first!
         try application.remove(account)
-      } 
+      }
       catch {
         result(FlutterError(code: "CONFIG_ERROR", message: "Unable get remove accounts", details: nil))
         return
@@ -186,4 +186,13 @@ public class SwiftMsalFlutterPlugin: NSObject, FlutterPlugin {
       return
     }
   }
+  
+  // MARK: - Helpers
+  
+  private func filterReservedScopes(scopes: [String]) -> [String] {
+    let reservedScopes = ["openid", "profile", "offline_access"];
+    return scopes.filter( {!reservedScopes.contains($0)})
+  }
+
+  
 }
